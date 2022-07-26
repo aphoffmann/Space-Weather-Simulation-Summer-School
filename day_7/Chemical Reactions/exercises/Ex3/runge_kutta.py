@@ -1,4 +1,6 @@
 from numpy.linalg import norm
+import numpy as np
+import dormand_prince as dp
 
 def explicit_RK_stepper(f,x,t,h,a,b,c):
     """
@@ -75,10 +77,14 @@ def adaptive_explicit_RK_stepper(f,x,t,h,a,b,c,b_control):
             x_new - estimate of state at time t + h
             error - estimate of the accuracy
     """
-    return ... # please complete this function 
-               # hint: 
-               # It should be a rather simple adaptation of 
-               # explicit_RK_stepper
+    k = np.zeros(len(c))
+    k[0] = f(x,t)
+    for i in range(1,len(c)):
+        k[i] = f(x+ h*np.sum(a[i-1])*k[i-1],  t+c[i]*h)
+    
+    x_next = x + h*np.sum(np.multiply(b,k))
+    error = h*np.sum(np.multiply(b-b_control,k))
+    return (x_next, error)
 
 def adaptive_integrate(f, x0, tspan, h, step, rtol = 1e-8, atol = 1e-8):
     """
@@ -106,6 +112,10 @@ def adaptive_integrate(f, x0, tspan, h, step, rtol = 1e-8, atol = 1e-8):
             ts - time points visited during integration (list)
             xs - trajectory of the system (list of numpy arrays)
     """
+
+    x, error = adaptive_explicit_RK_stepper(x0,tspan[0],f,h,dp.a,dp.b,dp.c,dp.b_control)
+    
+    
     return ... # please complete this function 
                # Hint 1: The slide contain pseudo code that should be a good 
                #         starting ground!
