@@ -112,9 +112,10 @@ def adaptive_integrate(f, x0, tspan, h, step, rtol = 1e-8, atol = 1e-8):
             ts - time points visited during integration (list)
             xs - trajectory of the system (list of numpy arrays)
     """
-
+    while
     x, error = adaptive_explicit_RK_stepper(x0,tspan[0],f,h,dp.a,dp.b,dp.c,dp.b_control)
-    
+    if(error > rtol*x + atol):
+        continue
     
     return ... # please complete this function 
                # Hint 1: The slide contain pseudo code that should be a good 
