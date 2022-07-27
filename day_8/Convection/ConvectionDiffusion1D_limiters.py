@@ -24,11 +24,11 @@ plt.close()
 import matplotlib.animation as animation
 
 "Flow parameters"
-nu = 0.01
+nu = 0.001
 c = 2
 
 "Scheme parameters"
-beta = 1
+beta = 2
 
 "Number of points"
 N = 32
@@ -36,7 +36,7 @@ Dx = 1/N
 x = np.linspace(0,1,N+1)
 
 "Time parameters"
-dt = 0.1
+dt = .05
 time = np.arange(0,3+dt,dt)
 nt = np.size(time)
 
@@ -115,7 +115,7 @@ def animate(i):
     myAnimation.set_data(x, u)
     return myAnimation,
 
-anim = animation.FuncAnimation(fig,animate,frames=range(1,nt),blit=True,repeat=False)
+anim = animation.FuncAnimation(fig,animate,frames=range(1,nt),blit=True,repeat=True)
 
 "Compute error"
 error = np.max(np.abs(u-ua))

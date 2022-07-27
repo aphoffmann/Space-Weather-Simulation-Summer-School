@@ -88,10 +88,10 @@ def convert_wavelength_to_joules(wavelength):
 
 def calc_tau(SZA_in_deg, density_in_m3, scale_height_in_km, cross_section):
 
-    # We are only going to do this for a single wavelength for now!
-
-    cs = cross_section[0]
-
+    # check tau < 75
+    if(SZA_in_deg > 75): SZA_in_deg = 75
+    elif(SZA_in_deg < -75): SZA_in_deg = -75
+    
     # convert scale height to m:
     h = scale_height_in_km * 1000.0
 
@@ -104,12 +104,11 @@ def calc_tau(SZA_in_deg, density_in_m3, scale_height_in_km, cross_section):
     nWaves = len(cross_section)
     nAlts = len(density_in_m3)
     tau = np.zeros((nWaves, nAlts))
+    
+    for iWave in range(len(cross_section)):
+        tau[iWave][:] = integrated_density * cross_section[iWave]
 
-    # calculate Tau:
-    iWave = 5
-    tau[iWave][:] = integrated_density * cross_section[iWave]
-
-    return tau
+    return tau/np.cos(sza)
 
 #-----------------------------------------------------------------------------
 # Calculate energy deposition as a function of altitude, given:
@@ -133,16 +132,15 @@ def calculate_Qeuv(density_in_m3,
 
     Qeuv = np.zeros(nAlts)
 
-    iWave = 5
-
-    # intensity is a function of altitude (for a given wavelength):
-    intensity = intensity_inf[iWave] * np.exp(-tau[iWave][:])
-    Qeuv = Qeuv + \
-        efficiency * \
-        density_in_m3 * \
-        intensity * \
-        cross_section[iWave] * \
-        energies[iWave]
+    for iWave in range(len(tau)):
+        # intensity is a function of altitude (for a given wavelength):
+        intensity = intensity_inf[iWave] * np.exp(-tau[iWave][:])
+        Qeuv = Qeuv + \
+            efficiency * \
+            density_in_m3 * \
+            intensity * \
+            cross_section[iWave] * \
+            energies[iWave]
 
     return Qeuv
 

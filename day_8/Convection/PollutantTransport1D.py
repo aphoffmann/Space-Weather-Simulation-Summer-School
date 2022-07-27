@@ -52,9 +52,8 @@ nt = np.size(time)
 "Initialize solution variable"
 U = np.zeros((N+1,nt))
 
-
+flag = 0; ghost_flag = False
 for it in range(nt-1):
-
     "System matrix and RHS term"
     "Diffusion term"
     Diff = nu*(1/Dx**2)*(2*np.diag(np.ones(N+1)) - np.diag(np.ones(N),-1) - np.diag(np.ones(N),1))
@@ -63,35 +62,21 @@ for it in range(nt-1):
         
     "Sensor"
     U0 = U[:,it]
-    uaux = np.concatenate(([U0[0]], U0,[U0[N]]))
-    Du = uaux[1:N+3] - uaux[0:N+2] + 1e-8
-    r = Du[0:N+1]/Du[1:N+2]
-    
-    "Limiter"
-    if beta>0:
-        phi = np.minimum(np.minimum(beta*r,1),np.minimum(r,beta))
-        phi = np.maximum(0,phi)
-    else:
-        phi = 2*r/(r**2 + 1)
-        
-    phim = phi[0:N]
-    phip = phi[1:N+1]
-        
-    
+
     "Upwind scheme"
     cp = np.max([c,0])
     cm = np.min([c,0])
     
-    Advp = cp*(np.diag(1-phi) - np.diag(1-phip,-1))
-    Advm = cm*(np.diag(1-phi) - np.diag(1-phim,1))
-    Alow = Advp-Advm
+    if(not flag):
+        Advp = cp*(3/2*np.diag(np.ones(N+1), 0) - 2*np.diag(np.ones(N), -1) + 1/2*np.diag(np.ones(N-1), -2))
+        Advm = cm*(3/2*np.diag(np.ones(N+1), 0) - 2*np.diag(np.ones(N), 1) + 1/2*np.diag(np.ones(N-1), 2))
+    else:
+        Advp = cp*(np.diag(np.ones(N+1)) - np.diag(np.ones(N),-1))
+        Advm = cm*(np.diag(np.ones(N+1)) - np.diag(np.ones(N),1))
     
-    "Centered differences"
-    Advp = -0.5*c*np.diag(phip,-1)
-    Advm = -0.5*c*np.diag(phim,1)
-    Ahigh = Advp-Advm
-        
-    Adv = (1/Dx)*(Ahigh + Alow)
+    
+    
+    Adv = (1/Dx)*(Advp - Advm)
     A = Diff + Adv
     
     "Source term"
@@ -108,14 +93,16 @@ for it in range(nt-1):
     F[0] = 0
 
     "Boundary condition at x=1"
-    A[N,:] = np.concatenate((np.zeros(N),[1]))
-    F[N] = u0
-
-
+    A = np.vstack((A,np.zeros(N)))
+    A[N+1,:] = np.concatenate((np.zeros(N-2),[1,-2,1]))
+    F[N+1] = 0
+    
     "Solution of the linear system AU=F"
     u = np.linalg.solve(A,F)
     U[:,it+1] = u
     u = u[0:N+1]
+    
+
 
 
 "Animation of the results"
