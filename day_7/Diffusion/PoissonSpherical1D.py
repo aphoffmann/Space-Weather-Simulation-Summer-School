@@ -22,7 +22,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation    #We have to load this
 from math import pi
-%matplotlib qt
 plt.close()
 
 "Number of points"

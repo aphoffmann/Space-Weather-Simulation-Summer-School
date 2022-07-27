@@ -17,36 +17,59 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation    #We have to load this
 from math import pi
-%matplotlib qt
+#%matplotlib qt
 plt.close()
 
 "Number of points"
 N = 8
 Dx = 1/N
 x = np.linspace(0,1,N+1)
+u0 = 0
 
-"System matrix and RHS term"
-A = (1/Dx**2)*(2*np.diag(np.ones(N-1)) - np.diag(np.ones(N-2),-1) - np.diag(np.ones(N-2),1))
-F = (3*x[1:N] + x[1:N]**2)*np.exp(x[1:N])
 
-"Solution of the linear system AU=F"
-U = np.linalg.solve(A,F)
-u = np.concatenate(([0],U,[0]))
-ua = -x*(x-1)*np.exp(x)
+dt = 1/24
+t = np.arange(0,3+dt,dt)
+nt = t.shape[0]
+
+U = np.zeros((N+1,nt))
+U[:,0] = x*(3-2*x)*np.exp(x)+ u0
+
+
+for it in range(0,nt-1):
+
+    
+    ## System Matrix
+    A = (1/Dx**2)*(2*np.diag(np.ones(N+1)) - np.diag(np.ones(N),-1) - np.diag(np.ones(N),1))        
+    F = 2*(2*x**2+5*x-2)*np.exp(x)
+    
+    ## Temporal Term
+    A = A + (1/dt)*np.diag(np.ones(N+1))
+    F = F + U[:,it]/dt
+    
+    ## Boundary Conditions
+    A[0,:] = np.concatenate(([1], np.zeros(N)));
+    F[0] = u0
+    
+    "Solution of the linear system AU=F"
+    u = np.linalg.solve(A,F)
+    ua = 2*x*(3-2*x)*np.exp(x)
+    
+    U[it,it+1] = u 
+
 
 "Plotting solution"
 plt.plot(x,ua,'-r',linewidth=2,label='$u_a$')
 plt.plot(x,u,':ob',linewidth=2,label='$\widehat{u}$')
 plt.legend(fontsize=12,loc='upper left')
 plt.grid()
-plt.axis([0, 1,0, 0.5])
+plt.axis([0, 1,0, 6])
 plt.xlabel("x",fontsize=16)
 plt.ylabel("u",fontsize=16)
 
 "Compute error"
 error = np.max(np.abs(u-ua))
+e_old = error
 print("Linf error u: %g\n" % error)
-
 
 
 
