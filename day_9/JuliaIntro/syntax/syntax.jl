@@ -9,6 +9,7 @@
 exp(🔥)
 
 # Golden ratio
+ϕ = (sqrt(5)+1)/2
 φ = (√5 + 1)/2 
 phi = (sqrt(5) + 1)/2 
 

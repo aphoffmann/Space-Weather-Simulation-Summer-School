@@ -17,10 +17,10 @@ grads = func_dot.(x_range)
 
 # Now we initialize the dual numbers for the evaluation of the derivative 
 # of Simone's test function as
-x_dual = ?
+x_dual = [DualNumber(x,1.0) for x in x_range]
 
 # evaluate Simone's test function for each x in x_dual and save the result in dual_result
-dual_result = ?
+dual_result = func.(x_dual)
 
 #############################################################
 # plotting 

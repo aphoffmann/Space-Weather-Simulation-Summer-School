@@ -69,8 +69,8 @@ N = 1500
 #       x0_dual = [x0[1] + ∂x0[1]/∂α * ϵ, x0[2] + ∂x0[2]/∂α * ϵ]
 #       α_dual = [α + ∂α/∂α * ϵ]
 # since we want to compute the sensitivity of the final state wrt. parameter α
-α = DualNumber(1.5,?)
-x0_dual = [DualNumber(?,?), DualNumber(?,?)]
+α = DualNumber(1.5,1.0)
+x0_dual = [DualNumber(x0[1], 0.0), DualNumber(x0[2], 0.0)]
 
 
 # propagate dual numbers through simulation:
